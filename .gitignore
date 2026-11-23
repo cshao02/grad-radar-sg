@@ -1,0 +1,6 @@
+node_modules/
+dist/
+# personal tracker/profile from local use: never publish
+data/store.json
+data/*.tmp
+*.log
