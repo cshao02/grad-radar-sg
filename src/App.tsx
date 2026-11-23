@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { isNewJob, matchesFeedFilters } from './feedFilters';
 import {
   api, ago, daysLeft, DEFAULT_PROFILE, DEFAULT_ROLES, money, roleName, ROLE_ORDER, scoreJob, snap, STATIC, STATUSES, statusLabel, TIER_LABEL, timeAgo,
   type Job, type Meta, type Profile, type Role, type Score, type Status, type Store, type Tier, type TrackerEntry,
@@ -73,7 +74,7 @@ export default function App() {
   };
 
   const lastSeen = store.state.lastSeenAt;
-  const isNew = useCallback((j: Job) => !j.closedAt && !!lastSeen && j.firstSeen > lastSeen, [lastSeen]);
+  const isNew = useCallback((j: Job) => isNewJob(j, lastSeen), [lastSeen]);
 
   const scored = useMemo(() => {
     const m = new Map<string, Score>();
@@ -81,22 +82,10 @@ export default function App() {
     return m;
   }, [jobs, profile]);
 
+  const matching = useMemo(() => jobs.filter((j) => matchesFeedFilters(j, filters, store.tracker)), [jobs, filters, store.tracker]);
+
   const visible = useMemo(() => {
-    const q = filters.q.trim().toLowerCase();
-    const list = jobs.filter((j) => {
-      if (!filters.roles.includes(j.role)) return false;
-      if (!filters.tiers.includes(j.tier)) return false;
-      if (filters.hideAgency && j.flags.agency) return false;
-      if (!filters.showIntern && j.flags.intern) return false;
-      if (!filters.showClosed && j.closedAt) return false;
-      if (filters.onlyNew && !isNew(j)) return false;
-      if (filters.hideTracked && store.tracker[j.id]) return false;
-      if (store.tracker[j.id]?.status === 'ignored' && !filters.showClosed) return false;
-      if (filters.source === 'mcf' && j.source !== 'MyCareersFuture') return false;
-      if (filters.source === 'company' && j.source === 'MyCareersFuture') return false;
-      if (q && !`${j.title} ${j.company} ${j.techs.join(' ')}`.toLowerCase().includes(q)) return false;
-      return true;
-    });
+    const list = filters.onlyNew ? matching.filter(isNew) : [...matching];
     const s = (j: Job) => scored.get(j.id)?.total ?? 0;
     const sal = (j: Job) => j.salary?.max ?? j.salary?.min ?? 0;
     list.sort((a, b) => {
@@ -106,7 +95,7 @@ export default function App() {
       return s(b) - s(a);
     });
     return list;
-  }, [jobs, filters, scored, store.tracker, isNew]);
+  }, [matching, filters.onlyNew, filters.sort, scored, isNew]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -119,7 +108,9 @@ export default function App() {
     return c;
   }, [jobs, filters.tiers, filters.hideAgency, filters.showIntern]);
 
-  const newCount = useMemo(() => jobs.filter(isNew).length, [jobs, isNew]);
+  const totalNewCount = useMemo(() => jobs.filter(isNew).length, [jobs, isNew]);
+  const newCount = useMemo(() => matching.filter(isNew).length, [matching, isNew]);
+  const hiddenNewCount = totalNewCount - newCount;
   const trackedCount = Object.values(store.tracker).filter((t) => t.status !== 'ignored').length;
   const openJob = useMemo(() => jobs.find((j) => j.id === openId) ?? null, [jobs, openId]);
 
@@ -221,8 +212,9 @@ export default function App() {
               <label><input type="checkbox" checked={filters.hideTracked} onChange={() => setFilters({ ...filters, hideTracked: !filters.hideTracked })} /> Hide ones I've tracked</label>
               <label><input type="checkbox" checked={filters.showClosed} onChange={() => setFilters({ ...filters, showClosed: !filters.showClosed })} /> Closed / ignored</label>
               <span className="sep" />
-              <label className={newCount ? 'newlabel' : ''}><input type="checkbox" checked={filters.onlyNew} onChange={() => setFilters({ ...filters, onlyNew: !filters.onlyNew })} /> New since last visit ({newCount})</label>
-              {newCount > 0 && <button className="link" onClick={markSeen}>Mark all seen</button>}
+              <label className={newCount ? 'newlabel' : ''} title="Newly discovered since your saved seen marker. This count respects all current filters; Mark all seen advances the marker."><input type="checkbox" checked={filters.onlyNew} onChange={() => setFilters({ ...filters, onlyNew: !filters.onlyNew })} /> New since last seen ({newCount})</label>
+              {hiddenNewCount > 0 && <span className="dim" title="New jobs excluded by your current role, experience, search or visibility filters.">{hiddenNewCount} new outside filters</span>}
+              {totalNewCount > 0 && <button className="link" title="Mark all newly discovered jobs seen, including those outside your current filters." onClick={markSeen}>Mark all seen</button>}
               <button className="link" onClick={() => setFilters(DEFAULT_FILTERS)}>Reset filters</button>
             </div>
           </section>
@@ -233,7 +225,11 @@ export default function App() {
           </div>
 
           {loading ? <div className="empty">Loading…</div> : visible.length === 0 ? (
-            <div className="empty">{jobs.length === 0 ? (meta?.refreshing ? 'Fetching the first batch of jobs… this takes about 10 seconds.' : 'No data yet. Click Refresh now.') : 'Nothing matches. Try Reset filters or tick "Experience not stated".'}</div>
+            <div className="empty">{jobs.length === 0 ? (meta?.refreshing ? 'Fetching the first batch of jobs… this takes about 10 seconds.' : 'No data yet. Click Refresh now.') : filters.onlyNew ? <>
+              No new jobs match your current filters.
+              {hiddenNewCount > 0 && ` ${hiddenNewCount} newly discovered job${hiddenNewCount === 1 ? ' is' : 's are'} outside these filters.`}
+              {' '}Turn off “New since last seen” to see all matching jobs.
+            </> : 'Nothing matches. Try Reset filters or tick "Experience not stated".'}</div>
           ) : (
             <ul className="cards">
               {visible.slice(0, 300).map((j) => (
