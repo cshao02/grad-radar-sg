@@ -92,7 +92,7 @@ select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; b
 .card:hover { border-color: #cbd5e1; box-shadow: 0 2px 10px rgba(15, 23, 42, .05); }
 .card.active { border-color: var(--brand2); box-shadow: 0 0 0 3px #ccfbf1; }
 .card.closed, .card.ign { opacity: .55; }
-.pick { accent-color: var(--brand); width: 16px; height: 16px; cursor: pointer; }
+input.pick { accent-color: var(--brand); width: 16px; height: 16px; cursor: pointer; }
 .main { min-width: 0; cursor: pointer; }
 .titleline { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .titleline h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -112,7 +112,9 @@ select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; b
 .techs .p { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
 .techs .more { background: none; color: var(--ink3); }
 .techs.big span, .techs.big button { font-size: 13px; padding: 4px 10px; }
-.techs.pick button { cursor: pointer; }
+.techs.skill-picker { width: 100%; height: auto; gap: 8px; align-items: center; }
+.techs.skill-picker button { cursor: pointer; flex: 0 0 auto; }
+.techs.skill-picker button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .actions { display: flex; gap: 8px; align-items: center; }
 .status { font-size: 13px; padding: 5px 8px; }
 .status.saved { background: #f1f5f9; }
@@ -177,7 +179,7 @@ textarea { width: 100%; padding: 10px; border: 1px solid var(--line); border-rad
 .panel h3 { margin: 0 0 4px; font-size: 15px; }
 .panel > .dim { margin: 0 0 12px; }
 .slider { display: grid; grid-template-columns: 160px 1fr 48px; gap: 12px; align-items: center; padding: 4px 0; }
-.slider input { accent-color: var(--brand); }
+.slider input { accent-color: var(--brand); min-width: 0; width: 100%; }
 .slider em { font-style: normal; text-align: right; color: var(--ink2); font-variant-numeric: tabular-nums; }
 .check { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -216,6 +218,14 @@ textarea { width: 100%; padding: 10px; border: 1px solid var(--line); border-rad
   .card .ring { display: none; }
   .card .actions { grid-column: 1 / -1; }
   .board { grid-template-columns: repeat(6, 220px); }
+}
+
+@media (max-width: 540px) {
+  .pagehead { flex-wrap: wrap; gap: 12px; }
+  .slider { grid-template-columns: 120px minmax(0, 1fr) 42px; gap: 8px; }
+  .manual li { flex-direction: column; gap: 2px; }
+  .manual a { min-width: 0; }
+  .legend { flex-wrap: wrap; }
 }
 
 .banner.info { background: #f0fdfa; color: #115e59; border: 1px solid #99f6e4; }

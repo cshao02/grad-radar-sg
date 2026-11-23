@@ -465,8 +465,8 @@ function ProfileView({ profile, meta, onSave, isDefault }: { profile: Profile; m
       <section className="panel">
         <h3>Skills</h3>
         <p className="dim">Click to cycle: none → familiar → strong → none. Strong counts fully, familiar counts 60%.</p>
-        <div className="techs big pick">
-          {cat.map((t) => <button key={t} className={p.strong.includes(t) ? 'm' : p.familiar.includes(t) ? 'p' : ''} onClick={() => setP((q) => {
+        <div className="techs big skill-picker" role="group" aria-label="Skill proficiency">
+          {cat.map((t) => <button key={t} type="button" title={`${t}: ${p.strong.includes(t) ? 'strong' : p.familiar.includes(t) ? 'familiar' : 'none'}. Click to change.`} className={p.strong.includes(t) ? 'm' : p.familiar.includes(t) ? 'p' : ''} onClick={() => setP((q) => {
             const s = q.strong.includes(t), f = q.familiar.includes(t);
             if (!s && !f) return { ...q, familiar: [...q.familiar, t] };
             if (f) return { ...q, familiar: q.familiar.filter((x) => x !== t), strong: [...q.strong, t] };
@@ -499,8 +499,13 @@ function SourcesView({ meta }: { meta: Meta | null }) {
       </section>
       <section className="panel">
         <h3>Check these by hand</h3>
-        <p className="dim">These employers have no public job feed, so they cannot be included automatically.</p>
+        <p className="dim">These portals are not directly integrated in this prototype. Check them yourself for roles the automatic feed may miss. Some of their postings may also appear through MyCareersFuture.</p>
         <ul className="manual">{manual.map((m) => <li key={m.name}><a href={m.url} target="_blank" rel="noreferrer">{m.name} ↗</a><span>{m.note}</span></li>)}</ul>
+      </section>
+      <section className="panel">
+        <h3>Government jobs: not complete coverage</h3>
+        <p>MyCareersFuture is government-run, but it is not a complete feed of public-service vacancies. Careers@Gov and agency career sites are not searched automatically by this app.</p>
+        <p className="dim">Use the Careers@Gov, GovTech and Public-sector tech careers links above to check public-sector opportunities. Entry-level classification in the feed is a best-effort inference, not an eligibility guarantee.</p>
       </section>
     </main>
   );

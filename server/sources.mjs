@@ -174,13 +174,15 @@ export const COMPANY_SOURCES = [
 ];
 
 export const MANUAL_SOURCES = [
-  { name: 'TikTok / ByteDance', url: 'https://joinbytedance.com/search?location=CT_75&category=6709824272505768200', note: 'No public API. Check the Singapore + Technology filter.' },
-  { name: 'Shopee / Sea Group', url: 'https://careers.shopee.sg/jobs', note: 'No public API. Filter by Singapore and Technology.' },
+  { name: 'TikTok / ByteDance', url: 'https://joinbytedance.com/search?location=CT_75&category=6709824272505768200', note: 'Not directly integrated. Check Singapore + Technology; some roles also appear via MyCareersFuture.' },
+  { name: 'Shopee / Sea Group', url: 'https://careers.shopee.sg/jobs', note: 'Not directly integrated. Filter by Singapore and Technology.' },
   { name: 'Google', url: 'https://www.google.com/about/careers/applications/jobs/results/?location=Singapore&target_level=EARLY', note: 'Early-career filter.' },
   { name: 'Microsoft', url: 'https://jobs.careers.microsoft.com/global/en/search?lc=Singapore&exp=Students%20and%20graduates', note: 'Students and graduates filter.' },
   { name: 'Amazon', url: 'https://www.amazon.jobs/en/search?base_query=software+development+engineer&loc_query=Singapore', note: 'SDE I roles.' },
   { name: 'Meta', url: 'https://www.metacareers.com/jobs?offices[0]=Singapore', note: 'Singapore office.' },
-  { name: 'DBS / GovTech / Sea Money', url: 'https://www.tech.gov.sg/careers/', note: 'GovTech graduate engineer programme; DBS and others run their own portals.' },
+  { name: 'Careers@Gov', url: 'https://jobs.careers.gov.sg/', note: 'Singapore Public Service vacancies. Not searched automatically; check software, developer and graduate opportunities here.' },
+  { name: 'GovTech', url: 'https://www.tech.gov.sg/careers/', note: 'GovTech opportunities and student/graduate programmes. Links to GovTech vacancies on Careers@Gov.' },
+  { name: 'Public-sector tech careers', url: 'https://techcareers.smartnation.gov.sg/', note: 'Official government technology careers hub with links to hiring agencies. Not an automated source in this app.' },
 ];
 
 const FETCHERS = { greenhouse: fetchGreenhouse, lever: fetchLever, ashby: fetchAshby, smartrecruiters: fetchSmartRecruiters };
