@@ -353,7 +353,7 @@ function JobCard({ job: j, score, entry, isNew, checked, active, onCheck, onOpen
           <option value="">Track…</option>
           {STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
         </select>
-        <a className="btn small" href={j.url || j.applyUrl} target="_self" title="Open the posting in this tab. Ctrl/Cmd-click to open a new tab." onClick={() => { if (!entry) void onStatus('saved'); }}>Open ↗</a>
+        <a className="btn small" href={j.url || j.applyUrl} target="_blank" rel="noopener noreferrer" title="Open the job posting in a new tab." onClick={() => { if (!entry) void onStatus('saved'); }}>Open ↗</a>
         <CopyJobLink url={j.url || j.applyUrl || ''} />
       </div>
     </li>
@@ -383,7 +383,7 @@ function Detail({ job: j, score, entry, isNew, onClose, onStatus, onNote }: {
           </div>
         </div>
         <div className="dact">
-          <a className="btn primary" href={j.url || j.applyUrl} target="_self" title="Open the posting in this tab. Ctrl/Cmd-click to open a new tab." onClick={() => { if (!entry) void onStatus('saved'); }}>Open posting ↗</a>
+          <a className="btn primary" href={j.url || j.applyUrl} target="_blank" rel="noopener noreferrer" title="Open the job posting in a new tab." onClick={() => { if (!entry) void onStatus('saved'); }}>Open posting ↗</a>
           <CopyJobLink url={j.url || j.applyUrl || ''} />
           <select className={`status ${entry?.status ?? 'none'}`} value={entry?.status ?? ''} onChange={(e) => onStatus((e.target.value || null) as Status | null)}>
             <option value="">Not tracked</option>
@@ -462,7 +462,7 @@ function TrackerView({ jobs, store, onOpen, onStatus }: { jobs: Job[]; store: St
                         {STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
                         <option value="">Remove</option>
                       </select>
-                      <a href={j?.url ?? t.job?.url} target="_self" title="Open the posting in this tab. Ctrl/Cmd-click to open a new tab.">Open ↗</a>
+                      <a href={j?.url ?? t.job?.url} target="_blank" rel="noopener noreferrer" title="Open the job posting in a new tab.">Open ↗</a>
                     </div>
                   </div>
                 );
