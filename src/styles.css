@@ -57,6 +57,12 @@ a { color: var(--brand); }
 .btn:disabled { opacity: .6; cursor: default; }
 .btn.small { padding: 5px 10px; font-size: 13px; }
 .btn.ghost { border-color: transparent; background: transparent; color: #cbd5e1; }
+.copy-link-overlay { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px; background: rgba(15,23,42,.3); }
+.copy-link-dialog { position: relative; width: min(480px, 100%); padding: 24px; background: #fff; border-radius: var(--r); box-shadow: 0 16px 48px rgba(15,23,42,.2); }
+.copy-link-dialog h3 { margin: 0 32px 12px 0; }
+.copy-link-dialog p { font-size: 13px; color: var(--ink2); }
+.copy-link-dialog input { width: 100%; margin-bottom: 16px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
+.copy-link-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .link { border: 0; background: none; color: var(--brand); cursor: pointer; padding: 0 4px; font-weight: 500; }
 .spin { width: 12px; height: 12px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: sweep .8s linear infinite; }
 
@@ -115,7 +121,7 @@ input.pick { accent-color: var(--brand); width: 16px; height: 16px; cursor: poin
 .techs.skill-picker { width: 100%; height: auto; gap: 8px; align-items: center; }
 .techs.skill-picker button { cursor: pointer; flex: 0 0 auto; }
 .techs.skill-picker button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-.actions { display: flex; gap: 8px; align-items: center; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .status { font-size: 13px; padding: 5px 8px; }
 .status.saved { background: #f1f5f9; }
 .status.applied { background: #dbeafe; border-color: #bfdbfe; }
@@ -151,7 +157,7 @@ input.pick { accent-color: var(--brand); width: 16px; height: 16px; cursor: poin
 .dhead h2 { margin: 0 0 4px; font-size: 19px; letter-spacing: -.02em; }
 .dhead p { margin: 0; color: var(--ink2); }
 .dhead .ring b { font-size: 19px; }
-.dact { display: flex; gap: 10px; margin: 18px 0 6px; }
+.dact { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 6px; }
 .drawer h4 { margin: 22px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink3); }
 .why { margin: 0; padding-left: 18px; color: var(--ink2); }
 .why li { margin: 2px 0; }

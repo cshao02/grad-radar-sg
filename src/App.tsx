@@ -283,6 +283,36 @@ function ScoreRing({ n, size = 46 }: { n: number; size?: number }) {
   );
 }
 
+// Plain links remain usable when an embedded browser blocks or redirects new-tab opens.
+// The copy fallback uses an in-page dialog rather than a window popup or a browser prompt.
+function CopyJobLink({ url }: { url: string }) {
+  const [copied, setCopied] = useState(false);
+  const [show, setShow] = useState(false);
+  const copy = async () => {
+    try {
+      if (!navigator.clipboard) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch { setShow(true); }
+  };
+  return <>
+    <button type="button" className="btn small" onClick={() => setShow(true)}>Copy link</button>
+    {show && <div className="copy-link-overlay" onClick={() => setShow(false)}>
+      <section className="copy-link-dialog" role="dialog" aria-modal="true" aria-label="Copy job link" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="x" aria-label="Close copy link" onClick={() => setShow(false)}>×</button>
+        <h3>Copy job link</h3>
+        <p>Select and copy this link, then paste it into your browser. If clipboard access is allowed, the button below can copy it for you.</p>
+        <input aria-label="Job URL" readOnly value={url} autoFocus onFocus={(e) => e.currentTarget.select()} />
+        <div className="copy-link-actions">
+          <button type="button" className="btn" onClick={() => void copy()}>{copied ? 'Copied' : 'Copy to clipboard'}</button>
+          <a className="btn primary" href={url} target="_self">Open in this tab</a>
+        </div>
+      </section>
+    </div>}
+  </>;
+}
+
 function JobCard({ job: j, score, entry, isNew, checked, active, onCheck, onOpen, onStatus }: {
   job: Job; score: Score; entry?: TrackerEntry; isNew: boolean; checked: boolean; active: boolean; onCheck: () => void; onOpen: () => void; onStatus: (s: Status | null) => void;
 }) {
@@ -323,7 +353,8 @@ function JobCard({ job: j, score, entry, isNew, checked, active, onCheck, onOpen
           <option value="">Track…</option>
           {STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
         </select>
-        <a className="btn small" href={j.applyUrl || j.url} target="_blank" rel="noreferrer" onClick={() => { if (!entry) onStatus('saved'); }}>Open ↗</a>
+        <a className="btn small" href={j.url || j.applyUrl} target="_self" title="Open the posting in this tab. Ctrl/Cmd-click to open a new tab." onClick={() => { if (!entry) void onStatus('saved'); }}>Open ↗</a>
+        <CopyJobLink url={j.url || j.applyUrl || ''} />
       </div>
     </li>
   );
@@ -352,7 +383,8 @@ function Detail({ job: j, score, entry, isNew, onClose, onStatus, onNote }: {
           </div>
         </div>
         <div className="dact">
-          <a className="btn primary" href={j.applyUrl || j.url} target="_blank" rel="noreferrer" onClick={() => { if (!entry) onStatus('saved'); }}>Open posting ↗</a>
+          <a className="btn primary" href={j.url || j.applyUrl} target="_self" title="Open the posting in this tab. Ctrl/Cmd-click to open a new tab." onClick={() => { if (!entry) void onStatus('saved'); }}>Open posting ↗</a>
+          <CopyJobLink url={j.url || j.applyUrl || ''} />
           <select className={`status ${entry?.status ?? 'none'}`} value={entry?.status ?? ''} onChange={(e) => onStatus((e.target.value || null) as Status | null)}>
             <option value="">Not tracked</option>
             {STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
@@ -430,7 +462,7 @@ function TrackerView({ jobs, store, onOpen, onStatus }: { jobs: Job[]; store: St
                         {STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
                         <option value="">Remove</option>
                       </select>
-                      <a href={j?.url ?? t.job?.url} target="_blank" rel="noreferrer">Open ↗</a>
+                      <a href={j?.url ?? t.job?.url} target="_self" title="Open the posting in this tab. Ctrl/Cmd-click to open a new tab.">Open ↗</a>
                     </div>
                   </div>
                 );
