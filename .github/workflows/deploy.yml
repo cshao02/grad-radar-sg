@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy_retry1.outputs.page_url || steps.deploy_retry2.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,5 +48,24 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+      # deploy-pages sometimes looks up the artifact before it becomes visible to the
+      # API and fails with 'No artifacts named "github-pages"' (actions/deploy-pages#451).
+      # The lookup fails before any deployment is created, so retrying just this step
+      # after a short wait is safe. (Re-running the whole job would upload a second
+      # artifact and fail with "Multiple artifacts" instead.)
       - id: deploy
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Wait for artifact to become visible
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 15
+      - id: deploy_retry1
+        if: steps.deploy.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Wait longer for artifact to become visible
+        if: steps.deploy_retry1.outcome == 'failure'
+        run: sleep 60
+      - id: deploy_retry2
+        if: steps.deploy_retry1.outcome == 'failure'
         uses: actions/deploy-pages@v4
